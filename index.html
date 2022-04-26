@@ -1,0 +1,108 @@
+<!doctype html>
+
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <title>CRUDas</title>
+  </head>
+  <body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="navbar-brand">CRUDas</div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                  <a onclick = "ShowRead()" id = "read" class="nav-link disabled">Resgatar</a>
+                </li>
+                <li class="nav-item">
+                  <a id = "find" class="nav-link">Filtrar</a>
+                </li>
+                <li class="nav-item">
+                  <a id = "create" class="nav-link">Cadastrar</a>
+                </li>
+                <li class="nav-item">
+                  <a id = "change" class="nav-link">Alterar</a>
+                </li>
+                <li class="nav-item">
+                  <a id = "delete" class="nav-link">Remover</a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+    </header><br>
+
+    <main id = "ctn">
+      <div class = "container">
+        <div id = "bt" class = "row">
+          <button onclick = "read()" class = "btn btn-primary btn-lg btn-block">
+            Resgatar Usuários
+          </button>
+        </div>
+      </div><br>
+      
+      <section id = "users" class = "container">
+        <!--Usuários-->
+      </section>
+    </main>
+
+    <script>
+      function ShowRead(){
+        let content = `
+          <div class = "container">
+            <div id = "bt" class = "row">
+              <button onclick = "read()" class = "btn btn-primary btn-lg btn-block">
+                Resgatar Usuários
+              </button>
+            </div>
+          </div><br>
+          
+          <section id = "users" class = "container">
+            <!--Usuários-->
+          </section>
+        `;
+
+        document.getElementById("ctn").innerHTML = content;
+      }
+
+      function read(){
+        $.ajax({
+          url: "http://127.0.0.1:8000/read",
+          method: "get",
+          async: true,
+          success: function(response){
+            if(response.response.length == 0){
+              let data = `
+                <div class="alert alert-warning" role="alert">
+                  Não há nenhum usuário cadastrado no banco de dados.
+                </div>
+              `;
+
+              let disabledButton = `
+              <button onclick = "read()" class = "btn btn-primary btn-lg btn-block" disabled>
+                Resgatar Usuários
+              </button>
+              `;
+
+              document.getElementById("users").innerHTML = data;
+              document.getElementById("bt").innerHTML = disabledButton;
+            } else {
+              
+            }
+          }
+        })
+      }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+  </body>
+</html>
