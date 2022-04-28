@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import *
-from models import Usuarios
+from models import *
 
 app = FastAPI()
 
@@ -16,89 +16,93 @@ app.add_middleware(
 @app.get("/read")
 def get_users():
     try:
-        users = [users.append({"id": user.id,
-            "nome": user.nome,
-            "cpf": user.cpf,
-            "idade": user.idade,
-            "estado_civil": user.estado_civil}) for user in session.query(Usuarios).all()]
+        users = []
+        for user in session.query(Users).all():
+            users.append({"id": user.ID,
+                        "nome": user.nome,
+                        "cpf": user.cpf,
+                        "idade": user.idade,
+                        "estado_civil": user.estado_civil})
 
-        return {"response": users}
+        return {"success": True, "content": users}
 
     except:
-        return {"response": "Ocorreu um erro ao consultar o banco."}
+        return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
 
 @app.post("/find")
 def find_users(ID: int):
-    try:
-        if ID:
-            if not session.query(Usuarios).filter(Usuarios.id == ID).one():
-                return {"response": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a alteração."}
+    if ID:
+        try:
+            if not session.query(session.query(Users).filter(Users.ID == ID).exists()).one()[0]:
+                return {"success": False, "content": f"Não existe nenhum usuário de ID {ID} cadastrado."}
 
-            user = session.query(Usuarios).filter(Usuarios.id == ID).one()
+            user = session.query(Users).filter(Users.ID == ID).one()
 
-            return {"response": {"id": user.id,
-                                "nome": user.nome,
-                                "cpf": user.cpf,
-                                "idade": user.idade,
-                                "estado_civil": user.estado_civil}}
+            return {"success": True, "content": {"id": user.ID,
+                                                "nome": user.nome,
+                                                "cpf": user.cpf,
+                                                "idade": user.idade,
+                                                "estado_civil": user.estado_civil}}
 
-        else:
-            return {"response": "Passe um ID válido para consulta."}
+        except:
+            return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
 
-    except:
-        return {"response": "Ocorreu um erro ao consultar o banco."}
+    else:
+        return {"success": False, "content": "Passe um ID válido para consulta."}
 
 @app.post("/register")
 def register_users(name: str, cpf: str, age: int, marital_state: str):
-    try:
-        if name and age and marital_state:
-            if len(cpf.strip()) < 11 or len(cpf.strip()) > 11:
-                return {"response": "O CPF deve ter 11 dígitos"}
+    if name and age and marital_state:
+        if len(cpf) != 11:
+            return {"success": False, "content": "O CPF deve ter 11 dígitos"}
 
-            if session.query(Usuarios).filter(Usuarios.cpf == cpf).one():
-                return {"response": f"Um usuário de CPF {cpf} já existe. Impossível realizar o cadastro."}
+        try:
+            if session.query(session.query(Users).filter(Users.cpf == cpf).exists()).one()[0]:
+                return {"success": False, "content": f"Um usuário de CPF {cpf} já existe. Impossível realizar o cadastro."}
 
-            session.add(Usuarios(nome = name, cpf = cpf, idade = age, estado_civil = marital_state))
+            session.add(Users(nome = name, cpf = cpf, idade = age, estado_civil = marital_state))
             session.commit()
 
-            return {"response": "Usuário cadastrado com sucesso!"}
+            return {"success": True, "content": "Usuário cadastrado com sucesso!"}
 
-        else:
-            return {"response": "Preencha todos os campos."}
+        except:
+            return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
 
-    except:
-        return {"response": "Ocorreu um erro ao consultar o banco."}
+    else:
+        return {"success": False, "content": "Preencha todos os campos."}
 
 @app.post("/change")
 def change_users(ID: int, new_name: str):
-    try:
-        if ID and new_name:
-            if not session.query(Usuarios).filter(Usuarios.id == ID).one():
-                return {"response": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a alteração."}
+    if ID and new_name:
+        try:
+            if not session.query(session.query(Users).filter(Users.ID == ID).exists()).one()[0]:
+                return {"success": False, "content": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a alteração."}
 
-            session.query(Usuarios).filter(Usuarios.id == ID).update({Usuarios.nome: new_name})
+            session.query(Users).filter(Users.ID == ID).update({Users.nome: new_name})
             session.commit()
 
-            return {"response": f"Nome do usuário de ID {ID} alterado com sucesso para {new_name}!"}
-                        
-        else:
-            return {"response": "Preencha todos os campos para realizar a alteração."}
+            return {"success": True, "content": f"Nome do usuário de ID {ID} alterado com sucesso para {new_name}!"}
 
-    except:
-        return {"response": "Ocorreu um erro ao consultar o banco."}
+        except:
+            return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
+                    
+    else:
+        return {"success": False, "content": "Preencha todos os campos para realizar a alteração."}
 
 @app.post("/delete")
 def delete_users(ID: int):
-    try:
-        if ID:
-            if not session.query(Usuarios).filter(Usuarios.id == ID).one():
-                return {"response": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a remoção."}
+    if ID:
+        try:
+            if not session.query(session.query(Users).filter(Users.ID == ID).exists()).one()[0]:
+                return {"success": False, "content": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a remoção."}
 
-            session.query(Usuarios).filter(Usuarios.id == ID).delete()
+            session.query(Users).filter(Users.ID == ID).delete()
             session.commit()
 
-        else:
-            return {"response": "Preencha o campo de ID para realizar a remoção."}
+            return {"success": True, "content": f"Usuário de ID {ID} removido com sucesso!"}
 
-    except:
-        return {"response": "Ocorreu um erro ao consultar o banco."}
+        except:
+            return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
+
+    else:
+        return {"success": False, "content": "Preencha o campo de ID para realizar a remoção."}

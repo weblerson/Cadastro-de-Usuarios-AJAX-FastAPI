@@ -1,6 +1,6 @@
 from config import *
 
-class Usuarios(Base):
+class Users(Base):
     __tablename__ = "usuarios"
     ID = Column(Integer, primary_key = True, autoincrement = True)
     nome = Column(String(50), nullable = False)

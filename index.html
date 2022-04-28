@@ -22,19 +22,19 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                  <a onclick = "ShowRead()" id = "read" class="nav-link disabled">Resgatar</a>
+                  <a style = "cursor: pointer;" onclick = "ShowRead()" id = "read" class="nav-link disabled">Resgatar</a>
                 </li>
                 <li class="nav-item">
-                  <a id = "find" class="nav-link">Filtrar</a>
+                  <a style = "cursor: pointer;" id = "find" class="nav-link">Filtrar</a>
                 </li>
                 <li class="nav-item">
-                  <a id = "create" class="nav-link">Cadastrar</a>
+                  <a style = "cursor: pointer;" onclick = "ShowRegister()" id = "create" class="nav-link">Cadastrar</a>
                 </li>
                 <li class="nav-item">
-                  <a id = "change" class="nav-link">Alterar</a>
+                  <a style = "cursor: pointer;" id = "change" class="nav-link">Alterar</a>
                 </li>
                 <li class="nav-item">
-                  <a id = "delete" class="nav-link">Remover</a>
+                  <a style = "cursor: pointer;" id = "delete" class="nav-link">Remover</a>
                 </li>
               </ul>
             </div>
@@ -71,7 +71,59 @@
           </section>
         `;
 
+        document.getElementById("read").className = "nav-link disabled";
+        document.getElementById("find").className = "nav-link";
+        document.getElementById("create").className = "nav-link";
+        document.getElementById("change").className = "nav-link";
+        document.getElementById("delete").className = "nav-link";
+
         document.getElementById("ctn").innerHTML = content;
+        document.getElementById("users").innerHTML = "";
+      }
+
+      function ShowRegister(){
+        let content = `
+          <form style = "margin-left: 10%; margin-right: 10%;">
+            <div class="form-group">
+              <label for="name">Nome Completo:</label>
+              <input type="text" class="form-control" id="name">
+            </div>
+
+            <div class="form-group">
+              <label for="cpf">CPF:</label>
+              <input type="text" class="form-control" id="cpf">
+            </div>
+
+            <div class = "form-group">
+              <label for = "age">Idade:</label>
+              <input type = "text" class = "form-control" id = "age">
+            </div>
+
+            <div class = "form-group">
+              <label for = "marital_state">Estado Civil:</label>
+              <select class = "form-control" id = "marital_state">
+                <option value = "solteiro">Solteiro</option>
+                <option value = "casado">Casado</option>
+                <option value = "divorciado">Divorciado</option>
+                <option value = "viúvo">Viúvo</option>
+                <option value = "separado judicialmente">Separado Judicialmente</option>
+              </select>
+            </div>
+          </form>
+
+          <div class = "container">
+            <button onclick = "create()" class="btn btn-primary">Registrar</button>
+          </div><br><br>
+        `;
+
+        document.getElementById("read").className = "nav-link";
+        document.getElementById("find").className = "nav-link";
+        document.getElementById("create").className = "nav-link disabled";
+        document.getElementById("change").className = "nav-link";
+        document.getElementById("delete").className = "nav-link";
+
+        document.getElementById("ctn").innerHTML = content;
+        document.getElementById("users").innerHTML = "";
       }
 
       function read(){
@@ -81,7 +133,7 @@
           async: true,
           success: function(response){
             if(response.response.length == 0){
-              let data = `
+              let messageContent = `
                 <div class="alert alert-warning" role="alert">
                   Não há nenhum usuário cadastrado no banco de dados.
                 </div>
@@ -93,10 +145,43 @@
               </button>
               `;
 
-              document.getElementById("users").innerHTML = data;
+              document.getElementById("users").innerHTML = messageContent;
               document.getElementById("bt").innerHTML = disabledButton;
             } else {
               
+            }
+          }
+        })
+      }
+
+      function create(){
+        $.ajax({
+          url: "http://127.0.0.1:8000/register",
+          method: "post",
+          data: {name: document.getElementById("name").value,
+              cpf: document.getElementById("cpf").value,
+              age: document.getElementById("age").value,
+              marital_state: document.getElementById("marital_state").value},
+          async: true,
+          success: function(response){
+            if(document.getElementById("users").innerHTML !== ""){
+              document.getElementById("users").innerHTML = "";
+            }
+
+            if(response.success){
+              let messageContent = `
+                <div class="alert alert-success" role="alert">
+                  ${response.content}
+                </div>
+              `;
+
+                document.getElementById("users").innerHTML = messageContent;
+            } else {
+              let messageContent = `
+                <div class="alert alert-warning" role="alert">
+                  ${response.content}
+                </div>
+              `;
             }
           }
         })
