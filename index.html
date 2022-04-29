@@ -114,6 +114,10 @@
           <div class = "container">
             <button onclick = "create()" class="btn btn-primary">Registrar</button>
           </div><br><br>
+
+          <section id = "users" class = "container">
+            <!--Usuários-->
+          </section>
         `;
 
         document.getElementById("read").className = "nav-link";
@@ -132,59 +136,106 @@
           method: "get",
           async: true,
           success: function(response){
-            if(response.response.length == 0){
+            if(response.success){
+              if(response.content.length === 0){
+                let messageContent = `
+                  <div class="alert alert-warning" role="alert">
+                    Não há nenhum usuário cadastrado no banco de dados.
+                  </div>
+                `;
+
+                let disabledButton = `
+                  <button onclick = "read()" class = "btn btn-primary btn-lg btn-block" disabled>
+                    Resgatar Usuários
+                  </button>
+                `;
+
+                document.getElementById("users").innerHTML = messageContent;
+                document.getElementById("bt").innerHTML = disabledButton;
+              } else {
+                document.getElementById("users").innerHTML = "";
+                document.getElementById("users").innerHTML = `<div id = "registeredUsers" class="row d-flex justify-content-center"></div>`;
+                
+                response.content.forEach(user => {
+                  let content = `
+                    <div class="card" style="width: 18rem;">
+                      <div class="card-body">
+                        <h5 class="card-title">${user.id} - ${user.nome}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Estado Civil: ${user.estado_civil}</h6>
+                        <p class="card-text">CPF: ${user.cpf}</p>
+                        <p class="card-text">Idade: ${user.idade}</p>
+                      </div>
+                    </div>
+                  `;
+
+                  document.getElementById("registeredUsers").innerHTML += content;
+                })
+
+                let disabledButton = `
+                  <button onclick = "read()" class = "btn btn-primary btn-lg btn-block" disabled>
+                    Resgatar Usuários
+                  </button>
+                `;
+
+                document.getElementById("bt").innerHTML = disabledButton;
+              }
+            } else {
               let messageContent = `
-                <div class="alert alert-warning" role="alert">
-                  Não há nenhum usuário cadastrado no banco de dados.
+                <div class="alert alert-danger" role="alert">
+                  ${response.content}
                 </div>
               `;
 
               let disabledButton = `
-              <button onclick = "read()" class = "btn btn-primary btn-lg btn-block" disabled>
-                Resgatar Usuários
-              </button>
-              `;
+                  <button onclick = "read()" class = "btn btn-primary btn-lg btn-block" disabled>
+                    Resgatar Usuários
+                  </button>
+                `;
 
               document.getElementById("users").innerHTML = messageContent;
               document.getElementById("bt").innerHTML = disabledButton;
-            } else {
-              
             }
           }
         })
       }
 
       function create(){
-        $.ajax({
-          url: "http://127.0.0.1:8000/register",
-          method: "post",
-          data: {name: document.getElementById("name").value,
-              cpf: document.getElementById("cpf").value,
-              age: document.getElementById("age").value,
-              marital_state: document.getElementById("marital_state").value},
-          async: true,
-          success: function(response){
-            if(document.getElementById("users").innerHTML !== ""){
-              document.getElementById("users").innerHTML = "";
-            }
+        let name = document.getElementById("name").value;
+        let cpf = document.getElementById("cpf").value;
+        let age = parseInt(document.getElementById("age").value);
+        let marital_state = document.getElementById("marital_state").value;
 
-            if(response.success){
-              let messageContent = `
-                <div class="alert alert-success" role="alert">
-                  ${response.content}
-                </div>
-              `;
+        let data = JSON.stringify({"name": name, "cpf": cpf, "age": age, "marital_state": marital_state});
 
-                document.getElementById("users").innerHTML = messageContent;
-            } else {
-              let messageContent = `
-                <div class="alert alert-warning" role="alert">
-                  ${response.content}
-                </div>
-              `;
-            }
-          }
+        fetch("http://127.0.0.1:8000/register",
+        {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: data
         })
+        .then(response => response.json())
+        .then(response => {
+          if(response.success){
+            let messageContent = `
+              <div class="alert alert-success" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          } else {
+            let messageContent = `
+              <div class="alert alert-warning" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          }
+        });
       }
     </script>
 
