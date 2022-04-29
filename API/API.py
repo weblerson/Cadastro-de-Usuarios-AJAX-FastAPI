@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
 from config import *
 from models import *
 
@@ -12,6 +14,13 @@ app.add_middleware(
     allow_headers = ["*"],
     allow_credentials = True
 )
+
+class User(BaseModel):
+    ID: Optional[int]
+    name: Optional[str]
+    cpf: Optional[str]
+    age: Optional[int]
+    marital_state: Optional[str]
 
 @app.get("/read")
 def get_users():
@@ -30,13 +39,13 @@ def get_users():
         return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
 
 @app.post("/find")
-def find_users(ID: int):
+def find_users(_user: User):
     if ID:
         try:
-            if not session.query(session.query(Users).filter(Users.ID == ID).exists()).one()[0]:
-                return {"success": False, "content": f"Não existe nenhum usuário de ID {ID} cadastrado."}
+            if not session.query(session.query(Users).filter(Users.ID == _user.ID).exists()).one()[0]:
+                return {"success": False, "content": f"Não existe nenhum usuário de ID {_user.ID} cadastrado."}
 
-            user = session.query(Users).filter(Users.ID == ID).one()
+            user = session.query(Users).filter(Users.ID == _user.ID).one()
 
             return {"success": True, "content": {"id": user.ID,
                                                 "nome": user.nome,
@@ -51,16 +60,16 @@ def find_users(ID: int):
         return {"success": False, "content": "Passe um ID válido para consulta."}
 
 @app.post("/register")
-def register_users(name: str, cpf: str, age: int, marital_state: str):
-    if name and age and marital_state:
-        if len(cpf) != 11:
+def register_users(_user: User):
+    if _user.name and _user.age and _user.marital_state:
+        if len(_user.cpf) != 11:
             return {"success": False, "content": "O CPF deve ter 11 dígitos"}
 
         try:
-            if session.query(session.query(Users).filter(Users.cpf == cpf).exists()).one()[0]:
-                return {"success": False, "content": f"Um usuário de CPF {cpf} já existe. Impossível realizar o cadastro."}
+            if session.query(session.query(Users).filter(Users.cpf == _user.cpf).exists()).one()[0]:
+                return {"success": False, "content": f"Um usuário de CPF {_user.cpf} já existe. Impossível realizar o cadastro."}
 
-            session.add(Users(nome = name, cpf = cpf, idade = age, estado_civil = marital_state))
+            session.add(Users(nome = _user.name, cpf = _user.cpf, idade = _user.age, estado_civil = _user.marital_state))
             session.commit()
 
             return {"success": True, "content": "Usuário cadastrado com sucesso!"}
