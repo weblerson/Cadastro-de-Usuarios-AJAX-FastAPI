@@ -40,7 +40,7 @@ def get_users():
 
 @app.post("/find")
 def find_users(_user: User):
-    if ID:
+    if _user.ID:
         try:
             if not session.query(session.query(Users).filter(Users.ID == _user.ID).exists()).one()[0]:
                 return {"success": False, "content": f"Não existe nenhum usuário de ID {_user.ID} cadastrado."}
@@ -81,16 +81,16 @@ def register_users(_user: User):
         return {"success": False, "content": "Preencha todos os campos."}
 
 @app.post("/change")
-def change_users(ID: int, new_name: str):
-    if ID and new_name:
+def change_users(_user: User):
+    if _user.ID and _user.marital_state:
         try:
-            if not session.query(session.query(Users).filter(Users.ID == ID).exists()).one()[0]:
+            if not session.query(session.query(Users).filter(Users.ID == _user.ID).exists()).one()[0]:
                 return {"success": False, "content": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a alteração."}
 
-            session.query(Users).filter(Users.ID == ID).update({Users.nome: new_name})
+            session.query(Users).filter(Users.ID == _user.ID).update({Users.estado_civil: _user.marital_state})
             session.commit()
 
-            return {"success": True, "content": f"Nome do usuário de ID {ID} alterado com sucesso para {new_name}!"}
+            return {"success": True, "content": f"Estado civil do usuário de ID {_user.ID} alterado com sucesso para {_user.marital_state}!"}
 
         except:
             return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
@@ -99,16 +99,16 @@ def change_users(ID: int, new_name: str):
         return {"success": False, "content": "Preencha todos os campos para realizar a alteração."}
 
 @app.post("/delete")
-def delete_users(ID: int):
-    if ID:
+def delete_users(_user: User):
+    if _user.ID:
         try:
-            if not session.query(session.query(Users).filter(Users.ID == ID).exists()).one()[0]:
-                return {"success": False, "content": f"Não existe nenhum usuário de ID {ID} cadastrado. Impossível realizar a remoção."}
+            if not session.query(session.query(Users).filter(Users.ID == _user.ID).exists()).one()[0]:
+                return {"success": False, "content": f"Não existe nenhum usuário de ID {_user.ID} cadastrado. Impossível realizar a remoção."}
 
-            session.query(Users).filter(Users.ID == ID).delete()
+            session.query(Users).filter(Users.ID == _user.ID).delete()
             session.commit()
 
-            return {"success": True, "content": f"Usuário de ID {ID} removido com sucesso!"}
+            return {"success": True, "content": f"Usuário de ID {_user.ID} removido com sucesso!"}
 
         except:
             return {"success": False, "content": "Ocorreu um erro ao consultar o banco."}
