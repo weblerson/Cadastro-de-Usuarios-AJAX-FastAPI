@@ -25,16 +25,16 @@
                   <a style = "cursor: pointer;" onclick = "ShowRead()" id = "read" class="nav-link disabled">Resgatar</a>
                 </li>
                 <li class="nav-item">
-                  <a style = "cursor: pointer;" id = "find" class="nav-link">Filtrar</a>
+                  <a style = "cursor: pointer;" onclick = "ShowFilter()" id = "find" class="nav-link">Filtrar</a>
                 </li>
                 <li class="nav-item">
                   <a style = "cursor: pointer;" onclick = "ShowRegister()" id = "create" class="nav-link">Cadastrar</a>
                 </li>
                 <li class="nav-item">
-                  <a style = "cursor: pointer;" id = "change" class="nav-link">Alterar</a>
+                  <a style = "cursor: pointer;" onclick = "ShowUpdate()" id = "change" class="nav-link">Alterar</a>
                 </li>
                 <li class="nav-item">
-                  <a style = "cursor: pointer;" id = "delete" class="nav-link">Remover</a>
+                  <a style = "cursor: pointer;" onclick = "ShowDelete()" id = "delete" class="nav-link">Remover</a>
                 </li>
               </ul>
             </div>
@@ -52,7 +52,7 @@
       
       <section id = "users" class = "container">
         <!--Usuários-->
-      </section>
+      </section><br><br>
     </main>
 
     <script>
@@ -68,11 +68,39 @@
           
           <section id = "users" class = "container">
             <!--Usuários-->
-          </section>
+          </section><br><br>
         `;
 
         document.getElementById("read").className = "nav-link disabled";
         document.getElementById("find").className = "nav-link";
+        document.getElementById("create").className = "nav-link";
+        document.getElementById("change").className = "nav-link";
+        document.getElementById("delete").className = "nav-link";
+
+        document.getElementById("ctn").innerHTML = content;
+        document.getElementById("users").innerHTML = "";
+      }
+
+      function ShowFilter(){
+        let content = `
+          <form style = "margin-left: 10%; margin-right: 10%;">
+            <div class="form-group">
+              <label for="name">ID:</label>
+              <input type="number" class="form-control" id="id">
+            </div>
+          </form>
+            
+          <div class = "container">
+            <button onclick = "filter()" class="btn btn-primary">Buscar</button>
+          </div><br><br>
+
+          <section id = "users" class = "container">
+            <!--Usuários-->
+          </section><br><br>
+        `;
+
+        document.getElementById("read").className = "nav-link";
+        document.getElementById("find").className = "nav-link disabled";
         document.getElementById("create").className = "nav-link";
         document.getElementById("change").className = "nav-link";
         document.getElementById("delete").className = "nav-link";
@@ -88,17 +116,14 @@
               <label for="name">Nome Completo:</label>
               <input type="text" class="form-control" id="name">
             </div>
-
             <div class="form-group">
               <label for="cpf">CPF:</label>
               <input type="text" class="form-control" id="cpf">
             </div>
-
             <div class = "form-group">
               <label for = "age">Idade:</label>
               <input type = "text" class = "form-control" id = "age">
             </div>
-
             <div class = "form-group">
               <label for = "marital_state">Estado Civil:</label>
               <select class = "form-control" id = "marital_state">
@@ -117,7 +142,7 @@
 
           <section id = "users" class = "container">
             <!--Usuários-->
-          </section>
+          </section><br><br>
         `;
 
         document.getElementById("read").className = "nav-link";
@@ -125,6 +150,73 @@
         document.getElementById("create").className = "nav-link disabled";
         document.getElementById("change").className = "nav-link";
         document.getElementById("delete").className = "nav-link";
+
+        document.getElementById("ctn").innerHTML = content;
+        document.getElementById("users").innerHTML = "";
+      }
+
+      function ShowUpdate(){
+        let content = `
+          <form style = "margin-left: 10%; margin-right: 10%;">
+            <div class="form-group">
+              <label for="name">ID:</label>
+              <input type="number" class="form-control" id="id">
+            </div>
+
+            <div class="form-group">
+              <label for = "marital_state">Estado Civil:</label>
+              <select class = "form-control" id = "marital_state">
+                <option value = "solteiro">Solteiro</option>
+                <option value = "casado">Casado</option>
+                <option value = "divorciado">Divorciado</option>
+                <option value = "viúvo">Viúvo</option>
+                <option value = "separado judicialmente">Separado Judicialmente</option>
+              </select>
+            </div>
+          </form>
+            
+          <div class = "container">
+            <button onclick = "update()" class="btn btn-primary">Alterar</button>
+          </div><br><br>
+
+          <section id = "users" class = "container">
+            <!--Usuários-->
+          </section><br><br>
+        `;
+
+        document.getElementById("read").className = "nav-link";
+        document.getElementById("find").className = "nav-link";
+        document.getElementById("create").className = "nav-link";
+        document.getElementById("change").className = "nav-link disabled";
+        document.getElementById("delete").className = "nav-link";
+
+        document.getElementById("ctn").innerHTML = content;
+        document.getElementById("users").innerHTML = "";
+      }
+
+      function ShowDelete(){
+        let content = `
+          <form style = "margin-left: 10%; margin-right: 10%;">
+            <div class="form-group">
+              <label for="name">ID:</label>
+              <input type="number" class="form-control" id="id">
+            </div>
+          </form>
+            
+          <div class = "container">
+            <button onclick = "remove()" class="btn btn-primary">Excluir</button>
+          </div><br><br>
+
+          <section id = "users" class = "container">
+            <!--Usuários-->
+          </section><br><br>
+        `;
+
+        document.getElementById("read").className = "nav-link";
+        document.getElementById("find").className = "nav-link";
+        document.getElementById("create").className = "nav-link";
+        document.getElementById("change").className = "nav-link";
+        document.getElementById("delete").className = "nav-link disabled";
 
         document.getElementById("ctn").innerHTML = content;
         document.getElementById("users").innerHTML = "";
@@ -199,6 +291,50 @@
         })
       }
 
+      function filter(){
+        document.getElementById("users").innerHTML = "";
+        let ID = parseInt(document.getElementById("id").value);
+
+        let data = JSON.stringify({"ID": ID});
+
+        fetch("http://127.0.0.1:8000/find",
+        {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: data
+        })
+        .then(response => response.json())
+        .then(response => {
+          if(response.success){
+            let content = `
+              <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">${response.content.id} - ${response.content.nome}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">Estado Civil: ${response.content.estado_civil}</h6>
+                  <p class="card-text">CPF: ${response.content.cpf}</p>
+                  <p class="card-text">Idade: ${response.content.idade}</p>
+                </div>
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = `<div id = "registeredUsers" class="row d-flex justify-content-center"></div>`;
+
+            document.getElementById("registeredUsers").innerHTML = content;
+          } else {
+            let messageContent = `
+              <div class="alert alert-warning" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          }
+        });
+      }
+
       function create(){
         let name = document.getElementById("name").value;
         let cpf = document.getElementById("cpf").value;
@@ -213,6 +349,79 @@
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
+          },
+          body: data
+        })
+        .then(response => response.json())
+        .then(response => {
+          if(response.success){
+            let messageContent = `
+              <div class="alert alert-success" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          } else {
+            let messageContent = `
+              <div class="alert alert-warning" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          }
+        });
+      }
+
+      function update(){
+        let ID = parseInt(document.getElementById("id").value);
+        let marital_state = document.getElementById("marital_state").value;
+
+        let data = JSON.stringify({"ID": ID, "marital_state": marital_state});
+
+        fetch("http://127.0.0.1:8000/change",
+        {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: data
+        })
+        .then(response => response.json())
+        .then(response => {
+          if(response.success){
+            let messageContent = `
+              <div class="alert alert-success" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          } else {
+            let messageContent = `
+              <div class="alert alert-warning" role="alert">
+                ${response.content}
+              </div>
+            `;
+
+            document.getElementById("users").innerHTML = messageContent;
+          }
+        });
+      }
+
+      function remove(){
+        let ID = parseInt(document.getElementById("id").value);
+
+        let data = JSON.stringify({"ID": ID});
+
+        fetch("http://127.0.0.1:8000/delete",
+        {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
           },
           body: data
         })
